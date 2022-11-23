@@ -1,6 +1,6 @@
 terraform {
    backend "s3" {
-     bucket = "udacity-srini-execerise-2"
+     bucket = "udacity-srini"
      key    = "terraform/terraform.tfstate"
      region = "us-east-2"
    }
