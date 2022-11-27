@@ -55,7 +55,9 @@ output "db_cluster_arn" {
 }
 
 output "db_instance_arn" {
-  value = aws_rds_cluster_instance.udacity_instance[0].arn
+
+  value = aws_rds_cluster_instance.udacity_instance[1].writer ? aws_rds_cluster_instance.udacity_instance[1].arn : aws_rds_cluster_instance.udacity_instance[0].arn
+
 }
 
 resource "aws_rds_cluster_instance" "udacity_instance" {
