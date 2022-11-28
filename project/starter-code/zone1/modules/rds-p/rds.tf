@@ -71,9 +71,14 @@ resource "aws_rds_cluster_instance" "udacity_instance" {
   db_subnet_group_name = aws_db_subnet_group.udacity_db_subnet_group.name
 
   # loop till we get the primary cluster ARN from tfstate because we could not know that at the apply stage
+  # provisioner "local-exec" {
+  #   command = "while [ mysql -h${aws_rds_cluster.udacity_cluster.arn} -D rdstest -e 'create table test(id int auto_increment primary key);']; do sleep 10; done;"
+  # }
+
   provisioner "local-exec" {
-    command = "while [ mysql -h${aws_rds_cluster.udacity_cluster.arn} -D rdstest -e 'create table test(id int auto_increment primary key);']; do sleep 10; done;"
+    command = "while [ mysql -h${aws_rds_cluster.rds_cluster.arn} -D rdstest -e 'create table test(id int auto_increment primary key);' ]; do sleep 10; done;"
   }
+
 }
 
 resource "aws_security_group" "db_sg_1" {
