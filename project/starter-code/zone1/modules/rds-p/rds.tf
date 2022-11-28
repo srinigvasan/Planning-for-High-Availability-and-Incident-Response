@@ -76,7 +76,7 @@ resource "aws_rds_cluster_instance" "udacity_instance" {
   # }
 
   provisioner "local-exec" {
-    command = "while [ mysql -h${aws_rds_cluster.udacity_cluster.arn} -D rdstest -e 'create table test(id int auto_increment primary key);' ]; do sleep 10; done;"
+    command = "while [ `mysql -h${aws_rds_cluster.udacity_cluster.arn} -D rdstest -e 'create table test(id int auto_increment primary key);'` ]; do sleep 10; done;"
   }
 
 }
