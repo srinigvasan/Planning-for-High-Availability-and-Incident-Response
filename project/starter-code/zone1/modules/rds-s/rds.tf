@@ -22,6 +22,8 @@ resource "aws_db_subnet_group" "udacity_db_subnet_group" {
   subnet_ids = var.private_subnet_ids
 }
 
+
+
 resource "aws_rds_cluster" "udacity_cluster-s" {
   cluster_identifier              = "udacity-db-cluster-s"
   availability_zones              = ["us-west-1a", "us-west-1c"]

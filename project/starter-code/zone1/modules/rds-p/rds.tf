@@ -48,6 +48,12 @@ resource "aws_rds_cluster" "udacity_cluster" {
   storage_encrypted               = false
   backup_retention_period         = 5
   depends_on                      = [aws_rds_cluster_parameter_group.cluster_pg]
+
+  # loop till we get the primary cluster ARN from tfstate because we could not know that at the apply stage
+  provisioner "local-exec" {
+    command = "while [ mysql -h${aws_rds_cluster.udacity_cluster.arn} -D rdstest -e 'create table test(id int auto_increment primary key);']; do sleep 10; done;"
+  }
+
 }
 
 output "db_cluster_arn" {
