@@ -22,8 +22,6 @@ resource "aws_db_subnet_group" "udacity_db_subnet_group" {
   subnet_ids = var.private_subnet_ids
 }
 
-
-
 resource "aws_rds_cluster" "udacity_cluster-s" {
   cluster_identifier              = "udacity-db-cluster-s"
   availability_zones              = ["us-west-1a", "us-west-1c"]
@@ -37,7 +35,7 @@ resource "aws_rds_cluster" "udacity_cluster-s" {
   backup_retention_period         = 5
   replication_source_identifier   = var.primary_db_cluster_arn
   source_region                   = "us-east-2"
-  depends_on                      = [var.primary_db_cluster_arn, aws_rds_cluster_parameter_group.cluster_pg-s]
+  depends_on                      = [aws_rds_cluster_parameter_group.cluster_pg-s]
 }
 
 resource "aws_rds_cluster_instance" "udacity_instance-s" {

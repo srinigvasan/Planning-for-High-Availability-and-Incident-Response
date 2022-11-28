@@ -1,29 +1,16 @@
-# resource "aws_db_instance" "default" {
-#   allocated_storage    = 10
-#   engine               = "mysql"
-#   engine_version       = "5.7"
-#   instance_class       = "db.t3.micro"
-#   username             = "udacity"
-#   password             = "MyUdacityPassword"
-#   parameter_group_name = "default.mysql5.7"
-#   multi-az             = true
-#   skip_final_snapshot  = true
-# }
-
-
 resource "aws_rds_cluster_parameter_group" "cluster_pg" {
   name   = "udacity-pg-p"
   family = "aurora5.6"
 
   parameter {
-    name         = "binlog_format"
-    value        = "MIXED"
+    name  = "binlog_format"    
+    value = "MIXED"
     apply_method = "pending-reboot"
   }
 
   parameter {
-    name         = "log_bin_trust_function_creators"
-    value        = 1
+    name = "log_bin_trust_function_creators"
+    value = 1
     apply_method = "pending-reboot"
   }
 }
@@ -34,23 +21,20 @@ resource "aws_db_subnet_group" "udacity_db_subnet_group" {
 
 }
 resource "aws_rds_cluster" "udacity_cluster" {
-  cluster_identifier              = "udacity-db-cluster"
-  availability_zones              = ["us-east-2a", "us-east-2b"]
+  cluster_identifier       = "udacity-db-cluster"
+  availability_zones       = ["us-east-2a", "us-east-2b", "us-east-2c"]
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.cluster_pg.name
-  database_name                   = "udacityc2"
-  master_username                 = "udacity"
-  master_password                 = "MyUdacityPassword"
-  vpc_security_group_ids          = [aws_security_group.db_sg_1.id]
-  db_subnet_group_name            = aws_db_subnet_group.udacity_db_subnet_group.name
-  engine_mode                     = "provisioned"
-  engine_version                  = "5.6.mysql_aurora.1.19.1"
-  skip_final_snapshot             = true
-  storage_encrypted               = false
-  backup_retention_period         = 5
-  depends_on                      = [aws_rds_cluster_parameter_group.cluster_pg]
-
-
-
+  database_name            = "udacityc2"
+  master_username          = "udacity"
+  master_password          = "MyUdacityPassword"
+  vpc_security_group_ids   = [aws_security_group.db_sg_1.id]
+  db_subnet_group_name     = aws_db_subnet_group.udacity_db_subnet_group.name
+  engine_mode              = "provisioned"
+  engine_version           = "5.6.mysql_aurora.1.19.1" 
+  skip_final_snapshot      = true
+  storage_encrypted        = false
+  backup_retention_period  = 5
+  depends_on = [aws_rds_cluster_parameter_group.cluster_pg]
 }
 
 output "db_cluster_arn" {
@@ -58,9 +42,7 @@ output "db_cluster_arn" {
 }
 
 output "db_instance_arn" {
-
   value = aws_rds_cluster_instance.udacity_instance[1].arn
-
 }
 
 resource "aws_rds_cluster_instance" "udacity_instance" {
@@ -69,21 +51,11 @@ resource "aws_rds_cluster_instance" "udacity_instance" {
   cluster_identifier   = aws_rds_cluster.udacity_cluster.id
   instance_class       = "db.t2.small"
   db_subnet_group_name = aws_db_subnet_group.udacity_db_subnet_group.name
-
-  # loop till we get the primary cluster ARN from tfstate because we could not know that at the apply stage
-  # provisioner "local-exec" {
-  #   command = "while [ mysql -h${aws_rds_cluster.udacity_cluster.arn} -D rdstest -e 'create table test(id int auto_increment primary key);']; do sleep 10; done;"
-  # }
-
-  provisioner "local-exec" {
-    command = "while [ `mysql -h${aws_rds_cluster.udacity_cluster.arn} -D rdstest -e 'create table test(id int auto_increment primary key);'` ]; do sleep 10; done;"
-  }
-
 }
 
 resource "aws_security_group" "db_sg_1" {
   name   = "udacity-db-sg"
-  vpc_id = var.vpc_id
+  vpc_id =  var.vpc_id
 
   ingress {
     from_port   = 3306
