@@ -1,21 +1,39 @@
 # Infrastructure
 
 ## AWS Zones
+
 Identify your zones here
+Region :us-east-2, AZS: us-east-2a, us-east-2b
+Region :us-west-1, AZS: us-west-1b, us-west-1c
 
 ## Servers and Clusters
 
 ### Table 1.1 Summary
-| Asset      | Purpose           | Size                                                                   | Qty                                                             | DR                                                                                                           |
-|------------|-------------------|------------------------------------------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| Asset name | Brief description | AWS size eg. t3.micro (if applicable, not all assets will have a size) | Number of nodes/replicas or just how many of a particular asset | Identify if this asset is deployed to DR, replicated, created in multiple locations or just stored elsewhere |
+
+| Asset                   | Purpose                                       | Size                                                                   | Qty                                                             | DR                                                                                                           |
+| ----------------------- | --------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Asset name              | Brief description                             | AWS size eg. t3.micro (if applicable, not all assets will have a size) | Number of nodes/replicas or just how many of a particular asset | Identify if this asset is deployed to DR, replicated, created in multiple locations or just stored elsewhere |
+| EC2 instances/webserver | Ubuntu webserver                              | t3.micro                                                               | 3                                                               | yes                                                                                                          |
+| EKS instance            | eks cluster for grafana/prometheus monitoring | t3.medium                                                              | 2                                                               | yes                                                                                                          |
+| RDS instance            | mysql aurora DB instance                      | db.t2.small                                                            | 2                                                               | yes (data is replicated to secondary instance)                                                               |
+| Load balancer           | load balancer for webserver                   | -                                                                      | -                                                               | yes                                                                                                          |
 
 ### Descriptions
-More detailed descriptions of each asset identified above.
+
+EC2 webserver instances host apis
+EKS instances - host grafana/prometheus stack for monitoring
+RDS instances - mysql aurora database to store data
+LBS intances -> load balance the request in each region
 
 ## DR Plan
+
 ### Pre-Steps:
-List steps you would perform to setup the infrastructure in the other region. It doesn't have to be super detailed, but high-level should suffice.
+
+Deploy assets in multiple region
+Create a cloud load balancer and point DNS to the load balancer and it help us to have multiple instances behind 1 IP in a region
+Have a replicated database
 
 ## Steps:
-You won't actually perform these steps, but write out what you would do to "fail-over" your application and database cluster to the other region. Think about all the pieces that were setup and how you would use those in the other region
+
+Configure DNS entry at your DNS provider to point to the DR site.
+As we have already setup database replication,configure DR database cluster as active in real time.
